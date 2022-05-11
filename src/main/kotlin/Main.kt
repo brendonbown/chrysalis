@@ -1,7 +1,19 @@
-fun main(args: Array<String>) {
-    println("Hello World!")
+import UserAuthDB
 
-    // Try adding program arguments via Run/Debug configuration.
-    // Learn more about running applications: https://www.jetbrains.com/help/idea/running-applications.html.
-    println("Program arguments: ${args.joinToString()}")
+fun main() {
+
+    val username = System.getenv("CHRYSALIS_DB_USERNAME") ?: prompt("Username: ")
+    val password = System.getenv("CHRYSALIS_DB_PASSWORD") ?: prompt("Password: ")
+
+    if (username != null && password != null) {
+        val db = UserAuthDB(username, password)
+        println("Hello $username!")
+    } else {
+        println("Invalid username and/or password, please try again later")
+    }
+}
+
+fun prompt(promptText: String): String? {
+    print(promptText)
+    return readLine()
 }
