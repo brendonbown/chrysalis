@@ -18,7 +18,8 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
-    implementation("com.oracle.database.jdbc:ojdbc8-production:21.1.0.0")
+    implementation("org.jetbrains.exposed:exposed-java-time:$exposedVersion")
+    implementation("com.oracle.database.jdbc:ojdbc8-production:21.5.0.0")
 }
 
 tasks.test {

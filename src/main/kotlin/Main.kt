@@ -1,4 +1,4 @@
-import UserAuthDB
+import db.CesDb
 
 fun main() {
 
@@ -6,8 +6,9 @@ fun main() {
     val password = System.getenv("CHRYSALIS_DB_PASSWORD") ?: prompt("Password: ")
 
     if (username != null && password != null) {
-        val db = UserAuthDB(username, password)
+        val db = CesDb(username, password)
         println("Hello $username!")
+        db.getInfo()
     } else {
         println("Invalid username and/or password, please try again later")
     }
