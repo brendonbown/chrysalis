@@ -15,8 +15,6 @@ object UserAuthorization : Table("USER_AUTHORIZATION") {
     val grantedById: Column<String> = varchar("GRANTED_BY_ID", 9)
     val expiredDate: Column<LocalDate> = date("EXPIRED_DATE")
     val dateTimeRevoked: Column<LocalDate> = date("DATE_TIME_REVOKED")
-    val revokedById: Column<String> = varchar("REVOKED_BY_ID", 9)
-    val roleType: Column<String> = varchar("ROLE_TYPE", 8)
     val updateType: Column<String> = varchar("UPDATE_TYPE", 1)
     val clockStartTime: Column<String> = varchar("CLOCK_START_TIME", 5)
     val clockEndTime: Column<String> = varchar("CLOCK_END_TIME", 5)
