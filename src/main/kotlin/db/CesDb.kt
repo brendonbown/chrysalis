@@ -13,13 +13,26 @@ class CesDb(username: String, password: String) {
         )
     }
 
-    fun getInfo() {
+    fun getPersonId(netId: String): String? {
+        val personIdList = transaction {
+            Person
+                .slice(Person.personId)
+                .select { Person.netId eq netId }
+                .toList()
+        }
+
+        return personIdList.firstOrNull()?.get(Person.personId)
+    }
+
+    fun getAuthorizedAreas(personId: String): Set<String> {
         val query =  transaction {
             UserAuthorization
                 .slice(UserAuthorization.informationalArea)
-                .select { UserAuthorization.personId eq "704224962" }
+                .select { UserAuthorization.personId eq personId }
+                .map { it[UserAuthorization.informationalArea] }
                 .toSet()
         }
-        println(query)
+
+        return query
     }
 }
