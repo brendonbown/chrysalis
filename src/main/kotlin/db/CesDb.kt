@@ -1,6 +1,7 @@
 package db
 
 import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.javatime.CurrentDateTime
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class CesDb(username: String, password: String) {
@@ -35,4 +36,52 @@ class CesDb(username: String, password: String) {
 
         return query
     }
+
+    fun addAuthorizedArea(personId: String, area: String) {
+        transaction {
+            UserAuthorization.insert(
+                UserAuthorization
+                    .slice(
+                        UserAuthorization.creditInstitution,
+                        UserAuthorization.varchar(personId, 9),
+                        UserAuthorization.informationalArea,
+                        CurrentDateTime,
+                        CurrentDateTime,
+                        UserAuthorization.grantedById,
+                        CurrentDateTime,
+                        UserAuthorization.varchar("U", 1),
+                        UserAuthorization.clockStartTime,
+                        UserAuthorization.clockEndTime,
+                        UserAuthorization.allowableDomain,
+                        UserAuthorization.limitationType,
+                        UserAuthorization.limitationValue
+                    )
+                    .select {
+                        (UserAuthorization.informationalArea eq area) and
+                        (CurrentDateTime.between(
+                            UserAuthorization.effectiveDate,
+                            UserAuthorization.expiredDate
+                        )) and
+                        (UserAuthorization.updateType eq "U")
+                    }
+                    .limit(1),
+                columns = listOf(
+                    UserAuthorization.creditInstitution,
+                    UserAuthorization.personId,
+                    UserAuthorization.informationalArea,
+                    UserAuthorization.effectiveDate,
+                    UserAuthorization.dateTimeGranted,
+                    UserAuthorization.grantedById,
+                    UserAuthorization.dateTimeRevoked,
+                    UserAuthorization.updateType,
+                    UserAuthorization.clockStartTime,
+                    UserAuthorization.clockEndTime,
+                    UserAuthorization.allowableDomain,
+                    UserAuthorization.limitationType,
+                    UserAuthorization.limitationValue
+                )
+            )
+        }
+    }
+
 }
