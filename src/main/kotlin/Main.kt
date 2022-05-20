@@ -16,7 +16,9 @@ fun main() {
 
         if (personId != null) {
             println(db.getAuthorizedAreas(personId))
-            println(db.addAuthorizedArea(personId, "GRADADMOGS"))
+            db.addAuthorizedArea(personId, "GRADADMOGS")
+            println(db.getAuthorizedAreas(personId))
+//            db.removeAuthorizedArea(personId, "GRADADMOGS")
             println(db.getAuthorizedAreas(personId))
         } else
             println("NetID is invalid!")

@@ -127,4 +127,23 @@ class CesDb(username: String, password: String) {
         }
     }
 
+    /**
+     * Removes the given area from the person with the given Person ID
+     *
+     * Performs the following SQL call:
+     *
+     * ```
+     * delete from user_authorization where
+     *   person_id = $PERSON_ID and
+     *   informational_area = $AREA
+     * ```
+     */
+    fun removeAuthorizedArea(personId: String, area: String) {
+        transaction {
+            UserAuthorization.deleteWhere {
+                UserAuthorization.personId.eq(personId) and
+                UserAuthorization.informationalArea.eq(area)
+            }
+        }
+    }
 }
