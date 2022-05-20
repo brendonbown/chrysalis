@@ -8,3 +8,8 @@
   * view permissions required by AIM page
   * add permissions required by AIM page
   * add permission by person
+
+# TODO
+* Test "add auth"
+* Implement args
+* Handle "No connection" errors

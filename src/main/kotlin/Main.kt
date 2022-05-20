@@ -14,9 +14,11 @@ fun main() {
         val db = CesDb(username, password)
         val personId = db.getPersonId(netId)
 
-        if (personId != null)
+        if (personId != null) {
             println(db.getAuthorizedAreas(personId))
-        else
+            println(db.addAuthorizedArea(personId, "GRADADMOGS"))
+            println(db.getAuthorizedAreas(personId))
+        } else
             println("NetID is invalid!")
     } else {
         println("Invalid username and/or password, please try again later")

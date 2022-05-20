@@ -37,19 +37,63 @@ class CesDb(username: String, password: String) {
         return query
     }
 
+    /**
+     * Adds the given area to the person with the given Person ID
+     *
+     * Performs the following SQL call:
+     *
+     * ```sql
+     * insert into user_authorization
+     *   (credit_institution,
+     *   person_id,
+     *   informational_area,
+     *   effective_date,
+     *   date_time_granted,
+     *   granted_by_id,
+     *   date_time_revoked,
+     *   update_type,
+     *   clock_start_time,
+     *   clock_end_time,
+     *   allowable_domain,
+     *   limitation_type,
+     *   limitation_value)
+     * select
+     *   credit_institution,
+     *   $PERSON_ID,
+     *   informational_area,
+     *   sysdate,
+     *   sysdate,
+     *   granted_by_id,
+     *   sysdate,
+     *   'U',
+     *   clock_start_time,
+     *   clock_end_time,
+     *   allowable_domain,
+     *   limitation_type,
+     *   limitation_value
+     * from user_authorization where
+     *   informational_area = $AREA and
+     *   effective_date < sysdate and
+     *   (expired_date is null or expired_date > sysdate) and
+     *   update_type = 'U' and
+     *
+     *   -- limit to only one row
+     *   rownum = 1
+     * ```
+     */
     fun addAuthorizedArea(personId: String, area: String) {
         transaction {
             UserAuthorization.insert(
                 UserAuthorization
                     .slice(
                         UserAuthorization.creditInstitution,
-                        UserAuthorization.varchar(personId, 9),
+                        stringLiteral(personId), // UserAuthorization.personId
                         UserAuthorization.informationalArea,
-                        CurrentDateTime,
-                        CurrentDateTime,
+                        CurrentDateTime.alias("EFFECTIVE_DATE"), // UserAuthorization.effectiveDate
+                        CurrentDateTime.alias("DATE_TIME_GRANTED"), // UserAuthorization.dateTimeGranted
                         UserAuthorization.grantedById,
-                        CurrentDateTime,
-                        UserAuthorization.varchar("U", 1),
+                        CurrentDateTime.alias("DATE_TIME_REVOKED"), // UserAuthorization.dateTimeRevoked
+                        stringLiteral("U"), // UserAuthorization.updateType
                         UserAuthorization.clockStartTime,
                         UserAuthorization.clockEndTime,
                         UserAuthorization.allowableDomain,
@@ -57,12 +101,11 @@ class CesDb(username: String, password: String) {
                         UserAuthorization.limitationValue
                     )
                     .select {
-                        (UserAuthorization.informationalArea eq area) and
-                        (CurrentDateTime.between(
-                            UserAuthorization.effectiveDate,
-                            UserAuthorization.expiredDate
-                        )) and
-                        (UserAuthorization.updateType eq "U")
+                        UserAuthorization.informationalArea.eq(area) and
+                        UserAuthorization.effectiveDate.less(CurrentDateTime) and
+                        (UserAuthorization.expiredDate.isNull() or
+                            UserAuthorization.expiredDate.greater(CurrentDateTime)) and
+                        UserAuthorization.updateType.eq("U")
                     }
                     .limit(1),
                 columns = listOf(
