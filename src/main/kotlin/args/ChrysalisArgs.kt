@@ -1,5 +1,9 @@
+import args.ByuId
+import args.NetId
+import args.PersonId
 import com.xenomachina.argparser.ArgParser
 import com.xenomachina.argparser.InvalidArgumentException
+import com.xenomachina.argparser.default
 
 enum class Action {
     LIST, // List all permissions for the user
@@ -25,11 +29,25 @@ enum class Action {
 }
 
 class ChrysalisArgs(parser: ArgParser) {
-    val action: Action by parser.positional(
+    val action by parser.positional(
         "ACTION",
         help = "action to perform",
         transform = Action::fromString
     )
 
+    val personId by parser.storing(
+        "-p", "--personId",
+        help = "perform the list/add/remove action for the person with the given Person ID"
+    ) { PersonId(this) }.default<PersonId?>(null)
+
+    val byuId by parser.storing(
+        "-b", "--byuId",
+        help = "perform the list/add/remove action for the person with the given BYU ID"
+    ) { ByuId(this) }.default<ByuId?>(null)
+
+    val netId by parser.storing(
+        "-n", "--netId",
+        help = "perform the list/add/remove action for the person with the given NetID"
+    ) { NetId(this) }.default<NetId?>(null)
 
 }

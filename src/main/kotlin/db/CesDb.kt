@@ -1,5 +1,9 @@
 package db
 
+import args.ByuId
+import args.Identifier
+import args.NetId
+import args.PersonId
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.javatime.CurrentDateTime
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -14,11 +18,16 @@ class CesDb(username: String, password: String) {
         )
     }
 
-    fun getPersonId(netId: String): String? {
+    fun getPersonId(ident: Identifier): String? {
+        val (column, identValue) = when (ident) {
+            is PersonId -> Pair(Person.personId, ident.personId)
+            is ByuId -> Pair(Person.byuId, ident.byuId)
+            is NetId -> Pair(Person.netId, ident.netId)
+        }
         val personIdList = transaction {
             Person
                 .slice(Person.personId)
-                .select { Person.netId eq netId }
+                .select { column eq identValue }
                 .toList()
         }
 
