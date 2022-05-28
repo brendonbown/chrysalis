@@ -13,6 +13,17 @@ enum class Action {
     CONFIG, // Configure Chrysalis
     VERSION; // Get version information
 
+    override fun toString(): String {
+        return when (this) {
+            LIST -> "list"
+            ADD -> "add"
+            REMOVE -> "remove"
+            PRODUCT_PERM -> "prod-perm"
+            CONFIG -> "config"
+            VERSION -> "version"
+        }
+    }
+
     companion object {
         fun fromString(value: String) = when (value) {
             "list" -> LIST

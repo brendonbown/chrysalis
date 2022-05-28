@@ -33,14 +33,6 @@ fun main(args: Array<String>) {
         val username = "oit#$userNetId"
         val db = CesDb(username, password)
 
-//        val personId = db.getPersonId(netId)
-//
-//        if (personId != null) {
-//            println(db.getAuthorizedAreas(personId))
-//            db.addAuthorizedArea(personId, "GRADADMOGS")
-//            println(db.getAuthorizedAreas(personId))
-//        }
-
         // Get the identifier used to add/remove/list authorizations
         //
         // Use the program args in this order:
@@ -51,11 +43,31 @@ fun main(args: Array<String>) {
         // If none are provided, use the current user's NetID
         val identifier = personId ?: byuId ?: netId ?: NetId(userNetId)
 
+        // Get the Person ID associated with the NetID
+        val personId = db.getPersonId(identifier)
+
+        if (personId == null) {
+            // If there isn't an associated Person ID, print an error
+            printError("Person ID not found for '$identifier'. Ensure that it is correct, then retry.")
+            return
+        }
+
+        // Ensure that the list of areas isn't empty if it is required
+        val requiresAreas = when (action) {
+            Action.ADD, Action.REMOVE -> true
+            else -> false
+        }
+
+        if (requiresAreas && areas.isEmpty()) {
+            printError("'$action' requires at least one area")
+            return
+        }
+
         // Perform the requested action
         when (action) {
-            Action.LIST -> listAuthorizedAreas(db, identifier)
-            Action.ADD -> addAuthorizedAreas(db, identifier, areas)
-            Action.REMOVE -> removeAuthorizedAreas(db, identifier, areas)
+            Action.LIST -> listAuthorizedAreas(db, personId)
+            Action.ADD -> addAuthorizedAreas(db, personId, areas)
+            Action.REMOVE -> removeAuthorizedAreas(db, personId, areas)
             else -> printError("Unimplemented!")
         }
     }
