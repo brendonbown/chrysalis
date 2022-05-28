@@ -54,7 +54,8 @@ fun main(args: Array<String>) {
         // Perform the requested action
         when (action) {
             Action.LIST -> listAuthorizedAreas(db, identifier)
-            Action.ADD -> printError("TODO: add this (basic)")
+            Action.ADD -> addAuthorizedAreas(db, identifier, areas)
+            Action.REMOVE -> removeAuthorizedAreas(db, identifier, areas)
             else -> printError("Unimplemented!")
         }
     }
