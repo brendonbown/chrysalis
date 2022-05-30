@@ -2,7 +2,7 @@ import args.ByuId
 import args.NetId
 import args.PersonId
 import com.xenomachina.argparser.ArgParser
-import com.xenomachina.argparser.SystemExitException
+import com.xenomachina.argparser.InvalidArgumentException
 import com.xenomachina.argparser.default
 
 enum class Action {
@@ -32,8 +32,8 @@ enum class Action {
             "prod-perm" -> PRODUCT_PERM
             "config" -> CONFIG
             "version", "--version" -> VERSION // accept "--version" because that's how most CLIs do it
-            else -> throw SystemExitException(
-                "Action must be one of 'list', 'add', 'remove', 'prod-perm', or 'config'", 1
+            else -> throw InvalidArgumentException(
+                "Action must be one of 'list', 'add', 'remove', 'prod-perm', or 'config'"
             )
         }
     }
