@@ -1,7 +1,7 @@
 import com.xenomachina.argparser.SystemExitException
 
 @Throws(SystemExitException::class)
-fun printError(error: String)  {
+fun printArgError(error: String)  {
     throw SystemExitException("ERROR: $error", 1)
 }
 

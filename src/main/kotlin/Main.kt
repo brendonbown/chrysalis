@@ -2,6 +2,8 @@ import args.NetId
 import com.xenomachina.argparser.ArgParser
 import com.xenomachina.argparser.mainBody
 import db.CesDb
+import db.ConnectionError
+import java.sql.SQLException
 
 fun main(args: Array<String>) = mainBody {
     // Parse args
@@ -41,30 +43,43 @@ fun main(args: Array<String>) = mainBody {
             // If none are provided, use the current user's NetID
             val identifier = personId ?: byuId ?: netId ?: NetId(userNetId)
 
-            // Get the Person ID associated with the NetID
-            val personId = db.getPersonId(identifier)
+            try {
+                // Get the Person ID associated with the NetID
+                val personId = db.getPersonId(identifier)
 
-            if (personId == null)
-                // If there isn't an associated Person ID, print an error
-                printError("Person ID not found for '$identifier'. Ensure that it is correct, then retry.")
-            else {
+                if (personId == null)
+                    // If there isn't an associated Person ID, print an error
+                    printArgError("Person ID not found for '$identifier'. Ensure that it is correct, then retry.")
+                else {
 
-                // Ensure that the list of areas isn't empty if it is required
-                val requiresAreas = when (action) {
-                    Action.ADD, Action.REMOVE -> true
-                    else -> false
-                }
-
-                if (requiresAreas && areas.isEmpty())
-                    printError("'$action' requires at least one area")
-                else
-                    // Perform the requested action
-                    when (action) {
-                        Action.LIST -> listAuthorizedAreas(db, personId)
-                        Action.ADD -> addAuthorizedAreas(db, personId, areas)
-                        Action.REMOVE -> removeAuthorizedAreas(db, personId, areas)
-                        else -> printError("Unimplemented!")
+                    // Ensure that the list of areas isn't empty if it is required
+                    val requiresAreas = when (action) {
+                        Action.ADD, Action.REMOVE -> true
+                        else -> false
                     }
+
+                    if (requiresAreas && areas.isEmpty())
+                        printArgError("'$action' requires at least one area")
+                    else
+                        // Perform the requested action
+                        when (action) {
+                            Action.LIST -> listAuthorizedAreas(db, personId)
+                            Action.ADD -> addAuthorizedAreas(db, personId, areas)
+                            Action.REMOVE -> removeAuthorizedAreas(db, personId, areas)
+                            else -> printArgError("Unimplemented!")
+                        }
+                }
+            } catch (e: SQLException) {
+                val error = ConnectionError.fromErrorCode(e.errorCode)
+                if (error == ConnectionError.UNKNOWN) {
+                    System.err.println("An unknown error has occurred with the following message:")
+                    System.err.print("\t") // Indent the error message
+                    System.err.println(e.message)
+                    System.err.println()
+                    System.err.println("Error code: ${e.errorCode}")
+                } else {
+                    System.err.println(error.toString())
+                }
             }
         }
     }
