@@ -48,7 +48,7 @@ class ChrysalisArgs(parser: ArgParser) {
 
     val areas by parser.positionalList(
         "AREAS",
-        help = "areas to add/remove",
+        help = "areas to add/remove (possible actions: 'list', 'add', 'remove', 'prod-perm', 'config')",
 
         // it is possible for there to be zero areas for commands like "list" or "version",
         // so checking for 1 or more must be done in commands that require this, such as "add" and "remove"
