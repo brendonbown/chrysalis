@@ -5,9 +5,3 @@
   * view permissions required by AIM page
   * add permissions required by AIM page
   * add permission by person
-* Catch "invalid password/username" errors
-
-# TODO
-* Test "add auth"
-* Implement args
-* Handle "No connection" errors

@@ -8,7 +8,7 @@ fun printArgError(error: String)  {
 fun prompt(promptText: String, hideInput: Boolean = false): String? {
     print(promptText)
     return if (hideInput)
-        System.console()?.readPassword()?.toString() ?: readLine()
+        System.console()?.readPassword()?.concatToString() ?: readLine()
     else
         readLine()
 }
