@@ -66,6 +66,7 @@ fun main(args: Array<String>) = mainBody {
                             Action.LIST -> listAuthorizedAreas(db, personId)
                             Action.ADD -> addAuthorizedAreas(db, personId, areas)
                             Action.REMOVE -> removeAuthorizedAreas(db, personId, areas)
+                            Action.VERSION -> printVersion()
                             else -> printArgError("Unimplemented!")
                         }
                 }

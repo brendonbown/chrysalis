@@ -30,3 +30,8 @@ fun removeAuthorizedAreas(db: CesDb, personId: String, areas: List<String>) {
         db.removeAuthorizedArea(personId, area)
     }
 }
+
+fun printVersion() {
+    // Print out the current version of `chrysalis` (found in `build.gradle.kts`)
+    println("chrysalis v0.1.0")
+}
