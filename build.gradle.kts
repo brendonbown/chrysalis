@@ -24,6 +24,8 @@ dependencies {
     implementation("com.oracle.database.jdbc:ojdbc8-production:21.5.0.0")
     implementation("com.xenomachina:kotlin-argparser:2.0.7")
 
+    implementation("com.squareup.okhttp3:okhttp:4.9.3")
+
     // This is for logging the results of Exposed
     // (https://www.slf4j.org/codes.html#StaticLoggerBinder)
     //
