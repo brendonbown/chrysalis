@@ -1,7 +1,8 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.6.20"
+    kotlin("jvm") version "1.6.21"
+    kotlin("plugin.serialization") version "1.6.21"
     application
 }
 
@@ -21,7 +22,11 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-java-time:$exposedVersion")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.3")
+
     implementation("com.oracle.database.jdbc:ojdbc8-production:21.5.0.0")
+
     implementation("com.xenomachina:kotlin-argparser:2.0.7")
 
     implementation("com.squareup.okhttp3:okhttp:4.9.3")
