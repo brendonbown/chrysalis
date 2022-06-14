@@ -10,7 +10,6 @@ enum class Action {
     ADD, // Add a permission/set of permissions for the user
     REMOVE, // Add a permission/set of permissions for the user
     PRODUCT_PERM, // Find the permissions for a given product (ex. ADV010)
-    CONFIG, // Configure Chrysalis
     VERSION; // Get version information
 
     override fun toString(): String {
@@ -19,7 +18,6 @@ enum class Action {
             ADD -> "add"
             REMOVE -> "remove"
             PRODUCT_PERM -> "prod-perm"
-            CONFIG -> "config"
             VERSION -> "version"
         }
     }
@@ -30,10 +28,9 @@ enum class Action {
             "add" -> ADD
             "remove" -> REMOVE
             "prod-perm" -> PRODUCT_PERM
-            "config" -> CONFIG
             "version", "--version" -> VERSION // accept "--version" because that's how most CLIs do it
             else -> throw InvalidArgumentException(
-                "Action must be one of 'list', 'add', 'remove', 'prod-perm', or 'config'"
+                "Action must be one of 'list', 'add', 'remove', 'prod-perm', or 'version'"
             )
         }
     }
@@ -42,13 +39,13 @@ enum class Action {
 class ChrysalisArgs(parser: ArgParser) {
     val action by parser.positional(
         "ACTION",
-        help = "action to perform",
+        help = "action to perform (possible actions: 'list', 'add', 'remove', 'prod-perm', 'version')",
         transform = Action::fromString
     )
 
     val areas by parser.positionalList(
         "AREAS",
-        help = "areas to add/remove (possible actions: 'list', 'add', 'remove', 'prod-perm', 'config')",
+        help = "areas to add/remove",
 
         // it is possible for there to be zero areas for commands like "list" or "version",
         // so checking for 1 or more must be done in commands that require this, such as "add" and "remove"
