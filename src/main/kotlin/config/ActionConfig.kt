@@ -5,7 +5,7 @@ import ChrysalisArgs
 
 sealed class ActionConfig
 
-
+// LIST ACTION
 class ListActionConfig(args: ChrysalisArgs): ActionConfig() {
 
     // Get user credentials for the database
@@ -15,6 +15,7 @@ class ListActionConfig(args: ChrysalisArgs): ActionConfig() {
 
 }
 
+// ADD ACTION
 class AddActionConfig(args: ChrysalisArgs): ActionConfig() {
 
     // Get user credentials for the database
@@ -25,6 +26,7 @@ class AddActionConfig(args: ChrysalisArgs): ActionConfig() {
 
 }
 
+// REMOVE ACTION
 class RemoveActionConfig(args: ChrysalisArgs): ActionConfig() {
 
     // Get user credentials for the database
@@ -35,10 +37,12 @@ class RemoveActionConfig(args: ChrysalisArgs): ActionConfig() {
 
 }
 
+// PRODUCT-PERM ACTION
 class ProductPermActionConfig: ActionConfig() {
     val apiConfig = ApiConfig()
 }
 
+// VERSION ACTION
 object VersionActionConfig : ActionConfig()
 
 /**
