@@ -1,87 +1,48 @@
-import args.NetId
 import com.xenomachina.argparser.ArgParser
 import com.xenomachina.argparser.mainBody
-import db.CesDb
+import config.*
 import db.ConnectionError
 import java.sql.SQLException
 
 fun main(args: Array<String>) = mainBody {
-    // Parse args
-    ArgParser(args).parseInto(::ChrysalisArgs).run {
-        // Get the NetID from the 'CHRYSALIS_NET_ID' environment variable
-        // or else prompt for it
-        //
-        // This will be used later to generate the database username ("oit#$netId")
-        val userNetId =
-            System.getenv("CHRYSALIS_NET_ID") ?: prompt("NetID: ")
-
-        // Get the Oracle database password from the 'CHRYSALIS_DB_PASSWORD' environment
-        // variable (possible insecure, need to consider this more later) or else
-        // prompt for it
-        val password =
-            System.getenv("CHRYSALIS_DB_PASSWORD") ?: prompt("Password: ", hideInput = true)
-
-        // Check that both the NetID and the database password are valid inputs
-        if (userNetId == null || password == null)
-            // If at least one is invalid, alert the user and end the program
-            println("Unable to read username and/or password, please try again later")
-        else {
-
-            // From the NetID, generate the database username, then log in to the database,
-            // creating a 'CesDb' access object that provides an interface through which
-            // the user can interact with the database
-            val username = "oit#$userNetId"
-            val db = CesDb(username, password)
-
-            // Get the identifier used to add/remove/list authorizations
-            //
-            // Use the program args in this order:
-            //   * --person-id/-p
-            //   * --byu-id/-b
-            //   * --net-id/-n
-            //
-            // If none are provided, use the current user's NetID
-            val identifier = personId ?: byuId ?: netId ?: NetId(userNetId)
-
-            try {
-                // Get the Person ID associated with the NetID
-                val personId = db.getPersonId(identifier)
-
-                if (personId == null)
-                    // If there isn't an associated Person ID, print an error
-                    printArgError("Person ID not found for '$identifier'. Ensure that it is correct, then retry.")
-                else {
-
-                    // Ensure that the list of areas isn't empty if it is required
-                    val requiresAreas = when (action) {
-                        Action.ADD, Action.REMOVE -> true
-                        else -> false
-                    }
-
-                    if (requiresAreas && areas.isEmpty())
-                        printArgError("'$action' requires at least one area")
-                    else
-                        // Perform the requested action
-                        when (action) {
-                            Action.LIST -> listAuthorizedAreas(db, personId)
-                            Action.ADD -> addAuthorizedAreas(db, personId, areas)
-                            Action.REMOVE -> removeAuthorizedAreas(db, personId, areas)
-                            Action.VERSION -> printVersion()
-                            else -> printArgError("Unimplemented!")
-                        }
-                }
-            } catch (e: SQLException) {
-                val error = ConnectionError.fromErrorCode(e.errorCode)
-                if (error == ConnectionError.UNKNOWN) {
-                    System.err.println("An unknown error has occurred with the following message:")
-                    System.err.print("\t") // Indent the error message
-                    System.err.println(e.message)
-                    System.err.println()
-                    System.err.println("Error code: ${e.errorCode}")
-                } else {
-                    System.err.println(error.toString())
-                }
-            }
+    /*
+    val api = ApiAccess("8bfe1cdacb587bc2a62ccdb4b4b543")
+    val webResInfo = api.getWebResourceInfo("ADV020")
+    println(webResInfo)
+    val webResId = webResInfo!!.content[0].webResourceId
+    val webResPolicies = api.getWebResourcePolicies(webResId)
+    println(webResPolicies)
+     */
+    try {
+        // Try to get configuration from args
+        val config = try {
+            ArgParser(args).parseInto(::ChrysalisArgs).let(::argsToConfig)
+        } catch (e: ConfigException) {
+            System.err.println("ERROR: ${e.message}")
+            return@mainBody
+        }
+        when (config) {
+            is ListActionConfig ->
+                listAuthorizedAreas(config.db, config.personId)
+            is AddActionConfig ->
+                addAuthorizedAreas(config.db, config.personId, config.areas)
+            is RemoveActionConfig ->
+                removeAuthorizedAreas(config.db, config.personId, config.areas)
+            is ProductPermActionConfig ->
+                println("Unimplemented!")//printProductPermissions()
+            is VersionActionConfig ->
+                printVersion()
+        }
+    } catch (e: SQLException) {
+        val error = ConnectionError.fromErrorCode(e.errorCode)
+        if (error == ConnectionError.UNKNOWN) {
+            System.err.println("An unknown error has occurred with the following message:")
+            System.err.print("\t") // Indent the error message
+            System.err.println(e.message)
+            System.err.println()
+            System.err.println("Error code: ${e.errorCode}")
+        } else {
+            System.err.println(error.toString())
         }
     }
 }
