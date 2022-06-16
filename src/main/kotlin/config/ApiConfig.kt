@@ -1,6 +1,7 @@
 package config
 
 import api.ApiAccess
+import getDebugEnv
 import prompt
 
 // Get the configuration for API Access
@@ -11,7 +12,7 @@ class ApiConfig {
     //
     // If it doesn't work, throw a config exception
     private val apiKey =
-        System.getenv("CHRYSALIS_API_KEY") ?:
+        getDebugEnv("CHRYSALIS_API_KEY") ?:
         prompt("API Key: ") ?:
         throw ConfigException("Unable to read API key, please try again later")
 

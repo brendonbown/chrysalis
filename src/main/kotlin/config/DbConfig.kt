@@ -4,6 +4,7 @@ import args.ByuId
 import args.NetId
 import args.PersonId
 import db.CesDb
+import getDebugEnv
 import prompt
 
 // Get the configuration for the database
@@ -18,7 +19,7 @@ class DbConfig(personIdArg: PersonId?, byuIdArg: ByuId?, netIdArg: NetId?) {
     //
     // This will be used later to generate the database username ("oit#$netId")
     private val userNetId =
-        System.getenv("CHRYSALIS_NET_ID") ?:
+        getDebugEnv("CHRYSALIS_NET_ID") ?:
         prompt("NetID: ") ?:
         throw ConfigException("Unable to read NetID, please try again later")
 
@@ -28,7 +29,7 @@ class DbConfig(personIdArg: PersonId?, byuIdArg: ByuId?, netIdArg: NetId?) {
     //
     // If it doesn't work, throw a config exception
     private val password =
-        System.getenv("CHRYSALIS_DB_PASSWORD") ?:
+        getDebugEnv("CHRYSALIS_DB_PASSWORD") ?:
         prompt("Password: ", hideInput = true) ?:
         throw ConfigException("Unable to read password, please try again later")
 
