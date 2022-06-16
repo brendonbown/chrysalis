@@ -15,24 +15,30 @@ fun main(args: Array<String>) = mainBody {
      */
     try {
         // Try to get configuration from args
-        val config = try {
-            ArgParser(args).parseInto(::ChrysalisArgs).let(::argsToConfig)
-        } catch (e: ConfigException) {
-            System.err.println("ERROR: ${e.message}")
-            return@mainBody
-        }
-        when (config) {
-            is ListActionConfig ->
-                listAuthorizedAreas(config.db, config.personId)
-            is AddActionConfig ->
-                addAuthorizedAreas(config.db, config.personId, config.areas)
-            is RemoveActionConfig ->
-                removeAuthorizedAreas(config.db, config.personId, config.areas)
-            is ProductPermActionConfig ->
-                println("Unimplemented!")//printProductPermissions()
-            is VersionActionConfig ->
-                printVersion()
-        }
+        val configResult = ArgParser(args).parseInto(::ChrysalisArgs).let(::argsToConfig)
+
+        configResult.fold(
+            // If the configuration was successful, perform the requested action
+            onSuccess = { config ->
+                when (config) {
+                    is ListActionConfig ->
+                        listAuthorizedAreas(config.db, config.personId)
+                    is AddActionConfig ->
+                        addAuthorizedAreas(config.db, config.personId, config.areas)
+                    is RemoveActionConfig ->
+                        removeAuthorizedAreas(config.db, config.personId, config.areas)
+                    is ProductPermActionConfig ->
+                        println("Unimplemented!")//printProductPermissions()
+                    is VersionActionConfig ->
+                        printVersion()
+                }
+            },
+
+            // If the configuration failed, print out the error
+            onFailure = { error ->
+                System.err.println("ERROR: ${error.message}")
+            }
+        )
     } catch (e: SQLException) {
         val error = ConnectionError.fromErrorCode(e.errorCode)
         if (error == ConnectionError.UNKNOWN) {

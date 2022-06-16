@@ -47,14 +47,23 @@ object VersionActionConfig : ActionConfig()
 
 /**
  * Convert from a ChrysalisArgs object to a config object
+ *
+ * This handles any configuration errors as well, returning
+ * a Result object for the user to handle
  */
 fun argsToConfig(args: ChrysalisArgs) =
-    when (args.action) {
-        Action.LIST -> ListActionConfig(args)
-        Action.ADD -> AddActionConfig(args)
-        Action.REMOVE -> RemoveActionConfig(args)
-        Action.PRODUCT_PERM -> ProductPermActionConfig()
-        Action.VERSION -> VersionActionConfig
+    try {
+        Result.success(
+            when (args.action) {
+                Action.LIST -> ListActionConfig(args)
+                Action.ADD -> AddActionConfig(args)
+                Action.REMOVE -> RemoveActionConfig(args)
+                Action.PRODUCT_PERM -> ProductPermActionConfig()
+                Action.VERSION -> VersionActionConfig
+            }
+        )
+    } catch(e: ConfigException) {
+        Result.failure(e)
     }
 
 /**
