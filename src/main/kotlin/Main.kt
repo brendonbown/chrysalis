@@ -5,14 +5,6 @@ import db.ConnectionError
 import java.sql.SQLException
 
 fun main(args: Array<String>) = mainBody {
-    /*
-    val api = ApiAccess("8bfe1cdacb587bc2a62ccdb4b4b543")
-    val webResInfo = api.getWebResourceInfo("ADV020")
-    println(webResInfo)
-    val webResId = webResInfo!!.content[0].webResourceId
-    val webResPolicies = api.getWebResourcePolicies(webResId)
-    println(webResPolicies)
-     */
     try {
         // Try to get configuration from args
         val configResult = ArgParser(args).parseInto(::ChrysalisArgs).let(::argsToConfig)
@@ -28,7 +20,7 @@ fun main(args: Array<String>) = mainBody {
                     is RemoveActionConfig ->
                         removeAuthorizedAreas(config.db, config.personId, config.areas)
                     is ProductPermActionConfig ->
-                        println("Unimplemented!")//printProductPermissions()
+                        printProductPermissions(config.apiAccess)
                     is VersionActionConfig ->
                         printVersion()
                 }
