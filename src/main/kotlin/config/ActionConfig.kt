@@ -39,7 +39,8 @@ class RemoveActionConfig(args: ChrysalisArgs): ActionConfig() {
 
 // PRODUCT-PERM ACTION
 class ProductPermActionConfig: ActionConfig() {
-    val apiConfig = ApiConfig()
+    private val apiConfig = ApiConfig()
+    val apiAccess = apiConfig.apiAccess
 }
 
 // VERSION ACTION
