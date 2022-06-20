@@ -14,6 +14,8 @@ fun getApiConfig(): ApiAccess {
         prompt("API Key: ") ?:
         throw ConfigException("Unable to read API key, please try again later")
 
+    println()
+
     // From the user's API key, create an API access object
     return ApiAccess(apiKey)
 }

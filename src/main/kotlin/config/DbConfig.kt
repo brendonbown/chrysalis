@@ -35,6 +35,8 @@ fun getDbConfig(personIdArg: PersonId?, byuIdArg: ByuId?, netIdArg: NetId?): Pai
         prompt("Password: ", hideInput = true) ?:
         throw ConfigException("Unable to read password, please try again later")
 
+    println()
+
     // From the NetID, generate the database username, then log in to the database,
     // creating a 'CesDb' access object that provides an interface through which
     // the user can interact with the database

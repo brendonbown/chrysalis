@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   variable is set
 * `--P` option
   * Allows to add/remove by product speed URL or title
-  * 
+  * syntax: `chrys add --P ADV16`
 
 ## [0.1.0]
 
