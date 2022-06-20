@@ -9,7 +9,6 @@ enum class Action {
     LIST, // List all permissions for the user
     ADD, // Add a permission/set of permissions for the user
     REMOVE, // Add a permission/set of permissions for the user
-    PRODUCT_PERM, // Find the permissions for a given product (ex. ADV010)
     VERSION; // Get version information
 
     override fun toString(): String {
@@ -17,7 +16,6 @@ enum class Action {
             LIST -> "list"
             ADD -> "add"
             REMOVE -> "remove"
-            PRODUCT_PERM -> "prod-perm"
             VERSION -> "version"
         }
     }
@@ -27,10 +25,9 @@ enum class Action {
             "list" -> LIST
             "add" -> ADD
             "remove" -> REMOVE
-            "prod-perm" -> PRODUCT_PERM
             "version", "--version" -> VERSION // accept "--version" because that's how most CLIs do it
             else -> throw InvalidArgumentException(
-                "Action must be one of 'list', 'add', 'remove', 'prod-perm', or 'version'"
+                "Action must be one of 'list', 'add', 'remove', or 'version'"
             )
         }
     }
@@ -54,17 +51,22 @@ class ChrysalisArgs(parser: ArgParser) {
 
     val personId by parser.storing(
         "-p", "--personId",
-        help = "perform the list/add/remove action for the person with the given Person ID"
+        help = "perform the action for the person with the given Person ID"
     ) { PersonId(this) }.default<PersonId?>(null)
 
     val byuId by parser.storing(
         "-b", "--byuId",
-        help = "perform the list/add/remove action for the person with the given BYU ID"
+        help = "perform the action for the person with the given BYU ID"
     ) { ByuId(this) }.default<ByuId?>(null)
 
     val netId by parser.storing(
         "-n", "--netId",
-        help = "perform the list/add/remove action for the person with the given NetID"
+        help = "perform the action for the person with the given NetID"
     ) { NetId(this) }.default<NetId?>(null)
 
+    val products by parser.adding(
+        "-P", "--product",
+        help = "perform the action for the areas associated with the given product " +
+                "(can be the name, 'Graduation Clearance Status', or the speed URL, 'ADV16')"
+    )
 }

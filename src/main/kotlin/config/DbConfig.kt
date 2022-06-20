@@ -1,24 +1,26 @@
 package config
 
 import args.ByuId
+import args.Identifier
 import args.NetId
 import args.PersonId
 import db.CesDb
 import getDebugEnv
 import prompt
 
-// Get the configuration for the database
-// (The Person ID, BYU ID, and NetID are optional - if they aren't present
-//  the user's NetID is used)
-class DbConfig(personIdArg: PersonId?, byuIdArg: ByuId?, netIdArg: NetId?) {
-
+/*
+ * Get the configuration for the database
+ * (The Person ID, BYU ID, and NetID are optional - if they aren't present
+ *  the user's NetID is used)
+ */
+fun getDbConfig(personIdArg: PersonId?, byuIdArg: ByuId?, netIdArg: NetId?): Pair<CesDb, String> {
     // Get the NetID from the 'CHRYSALIS_NET_ID' environment variable
     // or else prompt for it
     //
     // If it doesn't work, throw a config exception
     //
     // This will be used later to generate the database username ("oit#$netId")
-    private val userNetId =
+    val userNetId =
         getDebugEnv("CHRYSALIS_NET_ID") ?:
         prompt("NetID: ") ?:
         throw ConfigException("Unable to read NetID, please try again later")
@@ -28,7 +30,7 @@ class DbConfig(personIdArg: PersonId?, byuIdArg: ByuId?, netIdArg: NetId?) {
     // prompt for it
     //
     // If it doesn't work, throw a config exception
-    private val password =
+    val password =
         getDebugEnv("CHRYSALIS_DB_PASSWORD") ?:
         prompt("Password: ", hideInput = true) ?:
         throw ConfigException("Unable to read password, please try again later")
@@ -36,7 +38,7 @@ class DbConfig(personIdArg: PersonId?, byuIdArg: ByuId?, netIdArg: NetId?) {
     // From the NetID, generate the database username, then log in to the database,
     // creating a 'CesDb' access object that provides an interface through which
     // the user can interact with the database
-    private val username = "oit#$userNetId"
+    val username = "oit#$userNetId"
     val db = CesDb(username, password)
 
     // Get the identifier used to add/remove/list authorizations
@@ -52,4 +54,18 @@ class DbConfig(personIdArg: PersonId?, byuIdArg: ByuId?, netIdArg: NetId?) {
         byuIdArg ?:
         netIdArg ?:
         NetId(userNetId)
+
+    val personId =
+        getPersonId(db, identifier)
+
+    return Pair(db, personId)
 }
+
+/**
+ * Get the Person ID associated with the identifier
+ *
+ * If there's no Person ID associated, throw an error
+ */
+private fun getPersonId(db: CesDb, identifier: Identifier) =
+    db.getPersonId(identifier) ?:
+    throw ConfigException("Person ID not found for '${identifier}'. Ensure that it is correct, then retry.")

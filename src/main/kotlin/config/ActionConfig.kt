@@ -8,39 +8,36 @@ sealed class ActionConfig
 // LIST ACTION
 class ListActionConfig(args: ChrysalisArgs): ActionConfig() {
 
-    // Get user credentials for the database
-    private val dbConfig = DbConfig(args.personId, args.byuId, args.netId)
-    val personId = getPersonId(dbConfig)
-    val db = dbConfig.db
+    // Get database configs
+    private val dbConfig = getDbConfig(args.personId, args.byuId, args.netId)
+    val db = dbConfig.first
+    val personId = dbConfig.second
 
 }
 
 // ADD ACTION
 class AddActionConfig(args: ChrysalisArgs): ActionConfig() {
 
-    // Get user credentials for the database
-    private val dbConfig = DbConfig(args.personId, args.byuId, args.netId)
-    val personId = getPersonId(dbConfig)
+    // Get database configs
+    private val dbConfig = getDbConfig(args.personId, args.byuId, args.netId)
+    val db = dbConfig.first
+    val personId = dbConfig.second
+
+    // Get the areas to add
+    val productAreas = getProductAreas(args.products)
     val areas = nonEmptyAreaList(args.action, args.areas)
-    val db = dbConfig.db
 
 }
 
 // REMOVE ACTION
 class RemoveActionConfig(args: ChrysalisArgs): ActionConfig() {
 
-    // Get user credentials for the database
-    private val dbConfig = DbConfig(args.personId, args.byuId, args.netId)
-    val personId = getPersonId(dbConfig)
+    // Get database configs
+    private val dbConfig = getDbConfig(args.personId, args.byuId, args.netId)
+    val db = dbConfig.first
+    val personId = dbConfig.second
     val areas = nonEmptyAreaList(args.action, args.areas)
-    val db = dbConfig.db
 
-}
-
-// PRODUCT-PERM ACTION
-class ProductPermActionConfig: ActionConfig() {
-    private val apiConfig = ApiConfig()
-    val apiAccess = apiConfig.apiAccess
 }
 
 // VERSION ACTION
@@ -59,7 +56,6 @@ fun argsToConfig(args: ChrysalisArgs) =
                 Action.LIST -> ListActionConfig(args)
                 Action.ADD -> AddActionConfig(args)
                 Action.REMOVE -> RemoveActionConfig(args)
-                Action.PRODUCT_PERM -> ProductPermActionConfig()
                 Action.VERSION -> VersionActionConfig
             }
         )
@@ -67,19 +63,12 @@ fun argsToConfig(args: ChrysalisArgs) =
         Result.failure(e)
     }
 
+
+
 /**
  * Check if the `areas` list is non-empty
  */
 private fun nonEmptyAreaList(action: Action, areas: List<String>) =
     areas.ifEmpty {
-        throw ConfigException("'$action' requires at least one area")
+        throw ConfigException("'$action' requires at least one area or product")
     }
-
-/**
- * Get the Person ID associated with the identifier
- *
- * If there's no Person ID associated, throw an error
- */
-private fun getPersonId(dbConfig: DbConfig) =
-    dbConfig.db.getPersonId(dbConfig.identifier) ?:
-    throw ConfigException("Person ID not found for '${dbConfig.identifier}'. Ensure that it is correct, then retry.")

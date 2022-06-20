@@ -19,8 +19,6 @@ fun main(args: Array<String>) = mainBody {
                         addAuthorizedAreas(config.db, config.personId, config.areas)
                     is RemoveActionConfig ->
                         removeAuthorizedAreas(config.db, config.personId, config.areas)
-                    is ProductPermActionConfig ->
-                        printProductPermissions(config.apiAccess)
                     is VersionActionConfig ->
                         printVersion()
                 }

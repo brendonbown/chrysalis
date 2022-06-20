@@ -1,4 +1,3 @@
-import api.ApiAccess
 import db.CesDb
 
 fun listAuthorizedAreas(db: CesDb, personId: String) {
@@ -30,14 +29,6 @@ fun removeAuthorizedAreas(db: CesDb, personId: String, areas: List<String>) {
         println("removing $area")
         db.removeAuthorizedArea(personId, area)
     }
-}
-
-fun printProductPermissions(api: ApiAccess) {
-    val webResInfo = api.getWebResourceInfo("ADV020")
-    println(webResInfo)
-    val webResId = webResInfo!!.content[0].webResourceId
-    val webResPolicies = api.getWebResourcePolicies(webResId)
-    println(webResPolicies)
 }
 
 fun printVersion() {

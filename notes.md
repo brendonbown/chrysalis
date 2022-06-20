@@ -5,3 +5,4 @@
   * view permissions required by AIM page
   * add permissions required by AIM page
   * add permission by person
+* When [`kotlinx-cli`](https://github.com/Kotlin/kotlinx-cli) becomes stable, use it
