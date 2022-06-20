@@ -1,8 +1,5 @@
 # Notes
-* To see permissions required by AIM pages: https://y.sis-dev.byu.edu/001067/00001002
-  * Requires **PORTAL** permissions
-* Commands:
-  * view permissions required by AIM page
-  * add permissions required by AIM page
-  * add permission by person
 * When [`kotlinx-cli`](https://github.com/Kotlin/kotlinx-cli) becomes stable, use it
+* Handle errors with parsing JSON
+* Add support for multiple products
+* Add support for a 'repl' style command

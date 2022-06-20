@@ -24,8 +24,8 @@ class AddActionConfig(args: ChrysalisArgs): ActionConfig() {
     val personId = dbConfig.second
 
     // Get the areas to add
-    val productAreas = getProductAreas(args.products)
-    val areas = nonEmptyAreaList(args.action, args.areas)
+    private val productAreas = confirmProductAreas(getProductAreas(args.products), action = "add")
+    val areas = nonEmptyAreaSet(args.action, args.areas, productAreas)
 
 }
 
@@ -36,7 +36,10 @@ class RemoveActionConfig(args: ChrysalisArgs): ActionConfig() {
     private val dbConfig = getDbConfig(args.personId, args.byuId, args.netId)
     val db = dbConfig.first
     val personId = dbConfig.second
-    val areas = nonEmptyAreaList(args.action, args.areas)
+
+    // Get the areas to remove
+    private val productAreas = confirmProductAreas(getProductAreas(args.products), action = "remove")
+    val areas = nonEmptyAreaSet(args.action, args.areas, productAreas)
 
 }
 
@@ -66,9 +69,12 @@ fun argsToConfig(args: ChrysalisArgs) =
 
 
 /**
- * Check if the `areas` list is non-empty
+ * Check if the `areas` list or 'product areas' list is non-empty
  */
-private fun nonEmptyAreaList(action: Action, areas: List<String>) =
-    areas.ifEmpty {
-        throw ConfigException("'$action' requires at least one area or product")
-    }
+private fun nonEmptyAreaSet(action: Action, areas: List<String>, productAreas: List<String>) =
+    // Merge the two area lists together (removing duplicates)
+    areas.union(productAreas)
+        // If the result is empty, throw a config error
+        .ifEmpty {
+            throw ConfigException("'$action' requires at least one area or product")
+        }

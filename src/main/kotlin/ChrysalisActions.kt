@@ -15,7 +15,7 @@ fun listAuthorizedAreas(db: CesDb, personId: String) {
     }
 }
 
-fun addAuthorizedAreas(db: CesDb, personId: String, areas: List<String>) {
+fun addAuthorizedAreas(db: CesDb, personId: String, areas: Collection<String>) {
     // Add the given list of areas
     areas.forEach { area ->
         println("adding $area")
@@ -23,7 +23,7 @@ fun addAuthorizedAreas(db: CesDb, personId: String, areas: List<String>) {
     }
 }
 
-fun removeAuthorizedAreas(db: CesDb, personId: String, areas: List<String>) {
+fun removeAuthorizedAreas(db: CesDb, personId: String, areas: Collection<String>) {
     // Remove the given list of areas
     areas.forEach { area ->
         println("removing $area")
