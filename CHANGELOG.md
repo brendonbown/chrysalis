@@ -8,13 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.1] - 2022-06-20
 
+### Added
+* `--P` option
+  * Allows to add/remove by product speed URL or title
+  * syntax: `chrys add --P ADV16`
+
 ### Changed
 * *(Internal)* Refactored configuration to classes
 * `CHRYSALIS_NET_ID`, `CHRYSALIS_DB_PASSWORD`, and `CHRYSALIS_API_KEY` can only be used when the `DEBUG` environment
   variable is set
-* `--P` option
-  * Allows to add/remove by product speed URL or title
-  * syntax: `chrys add --P ADV16`
 
 ## [0.1.0] - 2022-06-06
 
