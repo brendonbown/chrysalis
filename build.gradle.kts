@@ -9,7 +9,7 @@ plugins {
 group = "me.bhb49"
 
 // Don't forget to update this value in the CHANGELOG and in the `version` command
-version = "0.1.0"
+version = "0.1.1"
 
 repositories {
     mavenCentral()

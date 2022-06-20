@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1] - 2022-06-20
+
 ### Changed
 * *(Internal)* Refactored configuration to classes
 * `CHRYSALIS_NET_ID`, `CHRYSALIS_DB_PASSWORD`, and `CHRYSALIS_API_KEY` can only be used when the `DEBUG` environment
@@ -14,7 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * Allows to add/remove by product speed URL or title
   * syntax: `chrys add --P ADV16`
 
-## [0.1.0]
+## [0.1.0] - 2022-06-06
 
 ### Added
 * Terminal commands
@@ -30,5 +32,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * `version`
     * prints the version number
 
-[Unreleased]: https://github.com/brendonbown/chrysalis/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/brendonbown/chrysalis/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/brendonbown/chrysalis/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/brendonbown/chrysalis/releases/tag/v0.1.0
