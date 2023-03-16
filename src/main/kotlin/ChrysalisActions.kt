@@ -33,5 +33,5 @@ fun removeAuthorizedAreas(db: CesDb, personId: String, areas: Collection<String>
 
 fun printVersion() {
     // Print out the current version of `chrysalis` (found in `build.gradle.kts`)
-    println("chrysalis v0.1.1")
+    println("chrysalis v$VERSION")
 }
