@@ -6,16 +6,19 @@ import args.NetId
 import args.PersonId
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.javatime.CurrentDateTime
+import org.jetbrains.exposed.sql.javatime.date
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class CesDb(username: String, password: String) {
     init {
+        Log.info("Connecting to database")
         Database.connect(
             "jdbc:oracle:thin:@ora7gdev.byu.edu:1521/cescpy1.byu.edu",
             driver = "oracle.jdbc.OracleDriver",
             username,
             password
         )
+        Log.info("Connected to database")
     }
 
     fun getPersonId(ident: Identifier): String? {
@@ -24,17 +27,27 @@ class CesDb(username: String, password: String) {
             is ByuId -> Pair(Person.byuId, ident.byuId)
             is NetId -> Pair(Person.netId, ident.netId)
         }
+
+        Log.info("Retrieving Person ID for $ident")
         val personIdList = transaction {
             Person
                 .slice(Person.personId)
                 .select { column eq identValue }
                 .toList()
         }
+        Log.info("Person ID retrieved for $ident")
+        Log.debug("Received ${
+            personIdList.joinToString(
+                prefix = "[",
+                postfix = "]"
+            ) { it[Person.personId] }
+        } for $ident")
 
         return personIdList.firstOrNull()?.get(Person.personId)
     }
 
     fun getAuthorizedAreas(personId: String): Set<String> {
+        Log.info("Retrieving authorized areas for '$personId'")
         val query =  transaction {
             UserAuthorization
                 .slice(UserAuthorization.informationalArea)
@@ -42,6 +55,8 @@ class CesDb(username: String, password: String) {
                 .map { it[UserAuthorization.informationalArea] }
                 .toSet()
         }
+        Log.info("Retrieved authorized areas for '$personId'")
+        Log.debug("Received ${query.joinToString(prefix = "[", postfix = "]")}")
 
         return query
     }
@@ -91,6 +106,7 @@ class CesDb(username: String, password: String) {
      * ```
      */
     fun addAuthorizedArea(personId: String, area: String) {
+        Log.info("Adding area '$area' for '$personId'")
         transaction {
             UserAuthorization.insert(
                 UserAuthorization
@@ -111,9 +127,9 @@ class CesDb(username: String, password: String) {
                     )
                     .select {
                         UserAuthorization.informationalArea.eq(area) and
-                        UserAuthorization.effectiveDate.less(CurrentDateTime) and
+                        UserAuthorization.effectiveDate.less(CurrentDateTime.date()) and
                         (UserAuthorization.expiredDate.isNull() or
-                            UserAuthorization.expiredDate.greater(CurrentDateTime)) and
+                            UserAuthorization.expiredDate.greater(CurrentDateTime.date())) and
                         UserAuthorization.updateType.eq("U")
                     }
                     .limit(1),
@@ -134,6 +150,7 @@ class CesDb(username: String, password: String) {
                 )
             )
         }
+        Log.info("Added area '$area' for '$personId'")
     }
 
     /**
@@ -148,11 +165,13 @@ class CesDb(username: String, password: String) {
      * ```
      */
     fun removeAuthorizedArea(personId: String, area: String) {
+        Log.info("Removing area '$area' for '$personId'")
         transaction {
             UserAuthorization.deleteWhere {
                 UserAuthorization.personId.eq(personId) and
                 UserAuthorization.informationalArea.eq(area)
             }
         }
+        Log.info("Removed area '$area' for '$personId'")
     }
 }
