@@ -63,10 +63,4 @@ class ChrysalisArgs(parser: ArgParser) {
         "-n", "--netId",
         help = "perform the action for the person with the given NetID"
     ) { NetId(this) }.default<NetId?>(null)
-
-    val products by parser.adding(
-        "-P", "--product",
-        help = "perform the action for the areas associated with the given product " +
-                "(can be the name, 'Graduation Clearance Status', or the speed URL, 'ADV16')"
-    )
 }
