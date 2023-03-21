@@ -1,6 +1,5 @@
-import args.ByuId
-import args.NetId
-import args.PersonId
+package args
+
 import com.xenomachina.argparser.ArgParser
 import com.xenomachina.argparser.InvalidArgumentException
 import com.xenomachina.argparser.default
@@ -27,7 +26,7 @@ enum class Action {
             "remove" -> REMOVE
             "version", "--version" -> VERSION // accept "--version" because that's how most CLIs do it
             else -> throw InvalidArgumentException(
-                "Action must be one of 'list', 'add', 'remove', or 'version'"
+                "args.Action must be one of 'list', 'add', 'remove', or 'version'"
             )
         }
     }
@@ -37,7 +36,7 @@ class ChrysalisArgs(parser: ArgParser) {
     val action by parser.positional(
         "ACTION",
         help = "action to perform (possible actions: 'list', 'add', 'remove', 'prod-perm', 'version')",
-        transform = Action::fromString
+        transform = Action.Companion::fromString
     )
 
     val areas by parser.positionalList(

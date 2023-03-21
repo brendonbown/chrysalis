@@ -1,7 +1,7 @@
 package config
 
-import Action
-import ChrysalisArgs
+import args.Action
+import args.ChrysalisArgs
 
 sealed class ActionConfig
 
@@ -45,7 +45,7 @@ class RemoveActionConfig(args: ChrysalisArgs): ActionConfig() {
 object VersionActionConfig : ActionConfig()
 
 /**
- * Convert from a ChrysalisArgs object to a config object
+ * Convert from a args.ChrysalisArgs object to a config object
  *
  * This handles any configuration errors as well, returning
  * a Result object for the user to handle
