@@ -20,20 +20,24 @@ fun getDbConfig(personIdArg: PersonId?, byuIdArg: ByuId?, netIdArg: NetId?): Pai
     // If it doesn't work, throw a config exception
     //
     // This will be used later to generate the database username ("oit#$netId")
+    Log.info("Getting user NetID")
     val userNetId =
         getDebugEnv("CHRYSALIS_NET_ID") ?:
         prompt("NetID: ") ?:
         throw ConfigException("Unable to read NetID, please try again later")
+    Log.info("Received user NetID $userNetId")
 
     // Get the Oracle database password from the 'CHRYSALIS_DB_PASSWORD' environment
     // variable (possible insecure, need to consider this more later) or else
     // prompt for it
     //
     // If it doesn't work, throw a config exception
+    Log.info("Getting user password")
     val password =
         getDebugEnv("CHRYSALIS_DB_PASSWORD") ?:
         prompt("Password: ", hideInput = true) ?:
         throw ConfigException("Unable to read password, please try again later")
+    Log.info("Received user password")
 
     println()
 
@@ -41,7 +45,9 @@ fun getDbConfig(personIdArg: PersonId?, byuIdArg: ByuId?, netIdArg: NetId?): Pai
     // creating a 'CesDb' access object that provides an interface through which
     // the user can interact with the database
     val username = "oit#$userNetId"
+    Log.info("Loading database connection for user '$username'")
     val db = CesDb(username, password)
+    Log.info("Loaded database connection for user '$username'")
 
     // Get the identifier used to add/remove/list authorizations
     //
@@ -56,6 +62,7 @@ fun getDbConfig(personIdArg: PersonId?, byuIdArg: ByuId?, netIdArg: NetId?): Pai
         byuIdArg ?:
         netIdArg ?:
         NetId(userNetId)
+    Log.info("Actions will be performed for $identifier")
 
     val personId =
         getPersonId(db, identifier)
