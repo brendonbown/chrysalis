@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 * Version is now statically generated when `chrysalis` is built
 
+### Removed
+* `-P` option
+  * With the switch to Tyk, this feature no longer functions
+  * If someone wants to figure out how Tyk works, feel free to add this back in
+
 ## [0.1.1] - 2022-06-20
 
 ### Added
