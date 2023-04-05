@@ -2,6 +2,7 @@ package config
 
 import args.Action
 import args.ChrysalisArgs
+import db.CesDb
 
 sealed class ActionConfig
 
@@ -19,9 +20,13 @@ class ListActionConfig(args: ChrysalisArgs): ActionConfig() {
 class AddActionConfig(args: ChrysalisArgs): ActionConfig() {
 
     // Get database configs
-    private val dbConfig = getDbConfig(args.personId, args.byuId, args.netId)
-    val db = dbConfig.first
-    val personId = dbConfig.second
+    val db: CesDb
+    val personId: String
+    init {
+        val dbConfig = getDbConfig(args.personId, args.byuId, args.netId)
+        db = dbConfig.first
+        personId = dbConfig.second
+    }
 
     // Get the areas to add
     val areas = nonEmptyAreaSet(args.action, args.areas)
@@ -32,9 +37,13 @@ class AddActionConfig(args: ChrysalisArgs): ActionConfig() {
 class RemoveActionConfig(args: ChrysalisArgs): ActionConfig() {
 
     // Get database configs
-    private val dbConfig = getDbConfig(args.personId, args.byuId, args.netId)
-    val db = dbConfig.first
-    val personId = dbConfig.second
+    val db: CesDb
+    val personId: String
+    init {
+        val dbConfig = getDbConfig(args.personId, args.byuId, args.netId)
+        db = dbConfig.first
+        personId = dbConfig.second
+    }
 
     // Get the areas to remove
     val areas = nonEmptyAreaSet(args.action, args.areas)
@@ -69,8 +78,13 @@ fun argsToConfig(args: ChrysalisArgs) =
 /**
  * Check if the `areas` list or 'product areas' list is non-empty
  */
-private fun nonEmptyAreaSet(action: Action, areas: List<String>) =
+private fun nonEmptyAreaSet(action: Action, vararg areas: List<String>) =
     // If the result is empty, throw a config error
-    areas.ifEmpty {
-        throw ConfigException("'$action' requires at least one area or product")
-    }
+    areas
+        .reduce { acc, newAreas ->
+            acc.plus(newAreas)
+        }
+        .toSet()
+        .ifEmpty {
+            throw ConfigException("'$action' requires at least one area or product")
+        }
