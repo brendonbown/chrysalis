@@ -6,7 +6,6 @@ import args.NetId
 import args.PersonId
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.javatime.CurrentDateTime
-import org.jetbrains.exposed.sql.javatime.date
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class CesDb(username: String, password: String) {
@@ -127,9 +126,9 @@ class CesDb(username: String, password: String) {
                     )
                     .select {
                         UserAuthorization.informationalArea.eq(area) and
-                        UserAuthorization.effectiveDate.less(CurrentDateTime.date()) and
+                        UserAuthorization.effectiveDate.less(CurrentDateTime) and // TODO `CurrentDateTime.date()` doesn't generate the right SQL, try something else to resolve warning
                         (UserAuthorization.expiredDate.isNull() or
-                            UserAuthorization.expiredDate.greater(CurrentDateTime.date())) and
+                            UserAuthorization.expiredDate.greater(CurrentDateTime)) and // TODO `CurrentDateTime.date()` doesn't generate the right SQL, try something else to resolve warning
                         UserAuthorization.updateType.eq("U")
                     }
                     .limit(1),
