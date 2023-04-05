@@ -62,4 +62,14 @@ class ChrysalisArgs(parser: ArgParser) {
         "-n", "--netId",
         help = "perform the action for the person with the given NetID"
     ) { NetId(this) }.default<NetId?>(null)
+
+    val verbose by parser.flagging(
+        "-v", "--verbose",
+        help = "enable verbose logging"
+    )
+
+    val debug by parser.flagging(
+        "-vv", "--debug",
+        help = "enable debug logging (overrides '--verbose' option)"
+    )
 }
