@@ -10,9 +10,13 @@ sealed class ActionConfig
 class ListActionConfig(args: ChrysalisArgs): ActionConfig() {
 
     // Get database configs
-    private val dbConfig = getDbConfig(args.personId, args.byuId, args.netId)
-    val db = dbConfig.first
-    val personId = dbConfig.second
+    val db: CesDb
+    val personId: String
+    init {
+        val dbConfig = getDbConfig(args.personId, args.byuId, args.netId)
+        db = dbConfig.first
+        personId = dbConfig.second
+    }
 
 }
 
