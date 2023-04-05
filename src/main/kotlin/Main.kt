@@ -8,8 +8,17 @@ import java.sql.SQLException
 fun main(args: Array<String>) = mainBody {
     try {
         // Try to get configuration from args
-        Log.info("Parsing args")
-        val configResult = ArgParser(args).parseInto(::ChrysalisArgs).let(::argsToConfig)
+        val argsResult = ArgParser(args).parseInto(::ChrysalisArgs)
+
+        // Set up logging if requested
+        if (argsResult.debug) {
+            Log.useDebugLevel()
+        } else if (argsResult.verbose) {
+            Log.useVerboseLevel()
+        }
+        Log.debug("Hey")
+
+        val configResult = argsToConfig(argsResult)
 
         configResult.fold(
             // If the configuration was successful, perform the requested action
