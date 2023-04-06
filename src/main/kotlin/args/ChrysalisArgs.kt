@@ -7,6 +7,7 @@ import com.xenomachina.argparser.default
 enum class Action {
     LIST, // List all permissions for the user
     ADD, // Add a permission/set of permissions for the user
+    COPY, // Copy permissions from a given person
     REMOVE, // Add a permission/set of permissions for the user
     VERSION; // Get version information
 
@@ -14,6 +15,7 @@ enum class Action {
         return when (this) {
             LIST -> "list"
             ADD -> "add"
+            COPY -> "copy"
             REMOVE -> "remove"
             VERSION -> "version"
         }
@@ -23,10 +25,11 @@ enum class Action {
         fun fromString(value: String) = when (value) {
             "list" -> LIST
             "add" -> ADD
+            "copy" -> COPY
             "remove" -> REMOVE
             "version", "--version" -> VERSION // accept "--version" because that's how most CLIs do it
             else -> throw InvalidArgumentException(
-                "args.Action must be one of 'list', 'add', 'remove', or 'version'"
+                "args.Action must be one of 'list', 'add', 'copy', 'remove', or 'version'"
             )
         }
     }
@@ -35,7 +38,7 @@ enum class Action {
 class ChrysalisArgs(parser: ArgParser) {
     val action by parser.positional(
         "ACTION",
-        help = "action to perform (possible actions: 'list', 'add', 'remove', 'prod-perm', 'version')",
+        help = "action to perform (possible actions: 'list', 'add', 'copy', 'remove', 'version')",
         transform = Action.Companion::fromString
     )
 
@@ -63,13 +66,13 @@ class ChrysalisArgs(parser: ArgParser) {
         help = "perform the action for the person with the given NetID"
     ) { NetId(this) }.default<NetId?>(null)
 
-    val verbose by parser.flagging(
+    val verbose by parser.counting(
         "-v", "--verbose",
-        help = "enable verbose logging"
+        help = "enable verbose logging (-vv enables debug logging)"
     )
 
     val debug by parser.flagging(
-        "-vv", "--debug",
+        "--debug",
         help = "enable debug logging (overrides '--verbose' option)"
     )
 }

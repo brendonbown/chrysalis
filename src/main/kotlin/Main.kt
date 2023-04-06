@@ -11,12 +11,13 @@ fun main(args: Array<String>) = mainBody {
         val argsResult = ArgParser(args).parseInto(::ChrysalisArgs)
 
         // Set up logging if requested
-        if (argsResult.debug) {
+        if (argsResult.debug || argsResult.verbose >= 2) {
             Log.useDebugLevel()
-        } else if (argsResult.verbose) {
+            Log.info("Using debug level logging")
+        } else if (argsResult.verbose == 1) {
             Log.useVerboseLevel()
+            Log.info("Using verbose level logging")
         }
-        Log.debug("Hey")
 
         val configResult = argsToConfig(argsResult)
 
@@ -28,6 +29,8 @@ fun main(args: Array<String>) = mainBody {
                         listAuthorizedAreas(config.db, config.personId)
                     is AddActionConfig ->
                         addAuthorizedAreas(config.db, config.personId, config.areas)
+                    is CopyActionConfig ->
+                        copyAuthorizedAreas(config.db, config.personId, config.fromNetId, config.fromPersonId)
                     is RemoveActionConfig ->
                         removeAuthorizedAreas(config.db, config.personId, config.areas)
                     is VersionActionConfig ->

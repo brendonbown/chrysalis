@@ -153,6 +153,94 @@ class CesDb(username: String, password: String) {
     }
 
     /**
+     * Adds the given area to the person with the given Person ID
+     *
+     * Performs the following SQL call:
+     *
+     * ```sql
+     * insert into user_authorization
+     *   (credit_institution,
+     *   person_id,
+     *   informational_area,
+     *   effective_date,
+     *   date_time_granted,
+     *   granted_by_id,
+     *   date_time_revoked,
+     *   update_type,
+     *   clock_start_time,
+     *   clock_end_time,
+     *   allowable_domain,
+     *   limitation_type,
+     *   limitation_value)
+     * select
+     *   credit_institution,
+     *   $PERSON_ID,
+     *   informational_area,
+     *   sysdate,
+     *   sysdate,
+     *   granted_by_id,
+     *   sysdate,
+     *   'U',
+     *   clock_start_time,
+     *   clock_end_time,
+     *   allowable_domain,
+     *   limitation_type,
+     *   limitation_value
+     * from user_authorization where
+     *   person_id = $FROM_PERSON_ID and
+     *   effective_date < sysdate and
+     *   (expired_date is null or expired_date > sysdate) and
+     *   update_type = 'U'
+     * ```
+     */
+    fun copyAuthorizedArea(personId: String, fromPersonId: String) {
+        Log.info("Copying areas from '$fromPersonId' for '$personId'")
+        transaction {
+            UserAuthorization.insert(
+                UserAuthorization
+                    .slice(
+                        UserAuthorization.creditInstitution,
+                        stringLiteral(personId), // UserAuthorization.personId
+                        UserAuthorization.informationalArea,
+                        CurrentDateTime.alias("EFFECTIVE_DATE"), // UserAuthorization.effectiveDate
+                        CurrentDateTime.alias("DATE_TIME_GRANTED"), // UserAuthorization.dateTimeGranted
+                        UserAuthorization.grantedById,
+                        CurrentDateTime.alias("DATE_TIME_REVOKED"), // UserAuthorization.dateTimeRevoked
+                        stringLiteral("U"), // UserAuthorization.updateType
+                        UserAuthorization.clockStartTime,
+                        UserAuthorization.clockEndTime,
+                        UserAuthorization.allowableDomain,
+                        UserAuthorization.limitationType,
+                        UserAuthorization.limitationValue
+                    )
+                    .select {
+                        UserAuthorization.personId.eq(fromPersonId) and
+                                UserAuthorization.effectiveDate.less(CurrentDateTime) and // TODO `CurrentDateTime.date()` doesn't generate the right SQL, try something else to resolve warning
+                                (UserAuthorization.expiredDate.isNull() or
+                                        UserAuthorization.expiredDate.greater(CurrentDateTime)) and // TODO `CurrentDateTime.date()` doesn't generate the right SQL, try something else to resolve warning
+                                UserAuthorization.updateType.eq("U")
+                    },
+                columns = listOf(
+                    UserAuthorization.creditInstitution,
+                    UserAuthorization.personId,
+                    UserAuthorization.informationalArea,
+                    UserAuthorization.effectiveDate,
+                    UserAuthorization.dateTimeGranted,
+                    UserAuthorization.grantedById,
+                    UserAuthorization.dateTimeRevoked,
+                    UserAuthorization.updateType,
+                    UserAuthorization.clockStartTime,
+                    UserAuthorization.clockEndTime,
+                    UserAuthorization.allowableDomain,
+                    UserAuthorization.limitationType,
+                    UserAuthorization.limitationValue
+                )
+            )
+        }
+        Log.info("Copied areas from '$fromPersonId' for '$personId'")
+    }
+
+    /**
      * Removes the given area from the person with the given Person ID
      *
      * Performs the following SQL call:
