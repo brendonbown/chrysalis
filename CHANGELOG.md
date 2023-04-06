@@ -6,6 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.2] - 2023-04-05
+
+### Added
+* `copy` command
+  * copies permissions from one user to another
+  * syntax: `chrys copy <netId>`
+* `-v`/`--verbose` and `-vv`/`--debug` options
+  * triggers logging to the console
+
 ### Changed
 * Version is now statically generated when `chrysalis` is built
 
@@ -42,6 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * `version`
     * prints the version number
 
-[Unreleased]: https://github.com/brendonbown/chrysalis/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/brendonbown/chrysalis/compare/v0.1.2...HEAD
+[0.1.2]: https://github.com/brendonbown/chrysalis/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/brendonbown/chrysalis/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/brendonbown/chrysalis/releases/tag/v0.1.0
