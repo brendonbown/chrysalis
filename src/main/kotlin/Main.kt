@@ -1,11 +1,14 @@
-import args.ChrysalisArgs
+import model.Action
+import model.Identifier
 import com.xenomachina.argparser.ArgParser
 import com.xenomachina.argparser.mainBody
-import config.*
 import db.ConnectionError
+import task.Task
+import task.TaskException
+import user.Log
 import java.sql.SQLException
 
-fun main(args: Array<String>) = mainBody {
+fun main(args: Array<String>) = mainBody("chrysalis") {
     try {
         // Try to get configuration from args
         val argsResult = ArgParser(args).parseInto(::ChrysalisArgs)
@@ -19,31 +22,35 @@ fun main(args: Array<String>) = mainBody {
             Log.info("Using verbose level logging")
         }
 
-        val configResult = argsToConfig(argsResult)
+        // Short circuit for 'version' action (no need to connect to the database)
+        if (argsResult.action == Action.VERSION) {
+            printVersion()
+            return@mainBody
+        }
 
-        configResult.fold(
-            // If the configuration was successful, perform the requested action
-            onSuccess = { config ->
-                when (config) {
-                    is ListActionConfig ->
-                        listAuthorizedAreas(config.db, config.personId)
-                    is AddActionConfig ->
-                        addAuthorizedAreas(config.db, config.personId, config.areas)
-                    is CopyActionConfig ->
-                        copyAuthorizedAreas(config.db, config.personId, config.fromNetId, config.fromPersonId)
-                    is RemoveActionConfig ->
-                        removeAuthorizedAreas(config.db, config.personId, config.areas)
-                    is VersionActionConfig ->
-                        printVersion()
+        argsResult.run {
+            // Get database configuration
+            val (db, personId) = Task.getDbConfig(personId, byuId, netId)
+
+            when (action) {
+                Action.LIST -> listAuthorizedAreas(db, personId)
+                Action.ADD -> addAuthorizedAreas(db, personId, nonEmptyAreaSet(action, areas))
+                Action.COPY -> {
+                    // Uses the `areas` list because of limitations in argument parsing
+                    if (areas.size != 1) throw TaskException("'copy' requires only one NetID")
+                    val fromNetId = areas[0]
+                    val fromPersonId =
+                        db.getPersonId(Identifier.NetId(fromNetId)) ?: throw TaskException("NetID '$fromNetId' doesn't exist")
+
+                    copyAuthorizedAreas(db, personId, fromNetId, fromPersonId)
                 }
-            },
-
-            // If the configuration failed, print out the error
-            onFailure = { error ->
-                Log.error(error.message ?: "Unknown config error")
-                System.err.println("ERROR: ${error.message}")
+                Action.REMOVE -> removeAuthorizedAreas(db, personId, nonEmptyAreaSet(action, areas))
+                Action.VERSION -> throw IllegalArgumentException("unreachable: 'version' action should already be handled")
             }
-        )
+        }
+    } catch (e: TaskException) {
+        Log.error(e.message ?: "Unknown config error")
+        System.err.println("ERROR: ${e.message}")
     } catch (e: SQLException) {
         val error = ConnectionError.fromErrorCode(e.errorCode)
         if (error == ConnectionError.UNKNOWN) {
@@ -59,3 +66,17 @@ fun main(args: Array<String>) = mainBody {
         }
     }
 }
+
+/**
+ * Check if the `areas` list or 'product areas' list is non-empty
+ */
+private fun nonEmptyAreaSet(action: Action, vararg areas: List<String>) =
+    // If the result is empty, throw a config error
+    areas
+        .reduce { acc, newAreas ->
+            acc.plus(newAreas)
+        }
+        .toSet()
+        .ifEmpty {
+            throw TaskException("'$action' requires at least one area or product")
+        }

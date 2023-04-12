@@ -1,4 +1,6 @@
 import db.CesDb
+import user.Log
+import user.Terminal
 
 fun listAuthorizedAreas(db: CesDb, personId: String) {
     // Get the list of authorized areas from the database
@@ -29,7 +31,7 @@ fun copyAuthorizedAreas(db: CesDb, personId: String, fromNetId: String, fromPers
     var answer: String?
     do {
         Log.debug("Prompting for answer")
-        answer = prompt("Continue? [Y/n] ")
+        answer = Terminal.prompt("Continue? [Y/n] ")
     } while (answer !in setOf("", "y", "n", "Y", "N"))
 
     if (answer == "n" || answer == "N") {

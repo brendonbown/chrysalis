@@ -1,7 +1,5 @@
 package model
 
-import com.xenomachina.argparser.InvalidArgumentException
-
 enum class Action {
     LIST, // List all permissions for the user
     ADD, // Add a permission/set of permissions for the user

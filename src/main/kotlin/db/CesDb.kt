@@ -1,13 +1,11 @@
 package db
 
-import args.ByuId
-import args.Identifier
-import args.NetId
-import args.PersonId
+import model.Identifier
 import db.table.Person
 import db.table.UserAuthorization
 import db.table.WebResource
 import db.table.WebResourceArea
+import user.Log
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.javatime.CurrentDateTime
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -26,9 +24,9 @@ class CesDb(username: String, password: String) {
 
     fun getPersonId(ident: Identifier): String? {
         val (column, identValue) = when (ident) {
-            is PersonId -> Pair(Person.personId, ident.personId)
-            is ByuId -> Pair(Person.byuId, ident.byuId)
-            is NetId -> Pair(Person.netId, ident.netId)
+            is Identifier.PersonId -> Pair(Person.personId, ident.personId)
+            is Identifier.ByuId -> Pair(Person.byuId, ident.byuId)
+            is Identifier.NetId -> Pair(Person.netId, ident.netId)
         }
 
         Log.info("Retrieving Person ID for $ident")
@@ -277,7 +275,7 @@ class CesDb(username: String, password: String) {
      *   where speed_url = $speedUrl
      * ```
      */
-    fun getSpeedUrlAreas(speedUrl: String) {
+    fun getSpeedUrlAreas(speedUrl: String): Set<String> {
         Log.info("Retrieving areas associated with '$speedUrl'")
         val areas = transaction {
             WebResource
@@ -296,5 +294,7 @@ class CesDb(username: String, password: String) {
         }
         Log.info("Retrieved areas associated with '$speedUrl'")
         Log.debug("Received ${areas.joinToString(prefix = "[", postfix = "]")}")
+
+        return areas
     }
 }
