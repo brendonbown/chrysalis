@@ -285,7 +285,7 @@ class CesDb(username: String, password: String) {
                     // join with the WEB_RESOURCE_AREA table
                     WebResourceArea,
                     // on the WEB_RESOURCE_ID fields
-                    { WebResource.webResourceId }, { WebResourceArea.webResourceId },
+                    { webResourceId }, { webResourceId },
                     // and only keep when SPEED_URL = $speedUrl
                     { WebResource.speedUrl.eq(speedUrl) }
                 )
