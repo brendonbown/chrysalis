@@ -4,6 +4,10 @@ import args.ByuId
 import args.Identifier
 import args.NetId
 import args.PersonId
+import db.table.Person
+import db.table.UserAuthorization
+import db.table.WebResource
+import db.table.WebResourceArea
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.javatime.CurrentDateTime
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -260,5 +264,37 @@ class CesDb(username: String, password: String) {
             }
         }
         Log.info("Removed area '$area' for '$personId'")
+    }
+
+    /**
+     * Retrieves the areas associated with a given speed URL.
+     *
+     * Performs the following SQL call:
+     *
+     * ```
+     * select informational_area from web_resource
+     *   join web_resource_area using(web_resource_id)
+     *   where speed_url = $speedUrl
+     * ```
+     */
+    fun getSpeedUrlAreas(speedUrl: String) {
+        Log.info("Retrieving areas associated with '$speedUrl'")
+        val areas = transaction {
+            WebResource
+                .innerJoin(
+                    // join with the WEB_RESOURCE_AREA table
+                    WebResourceArea,
+                    // on the WEB_RESOURCE_ID fields
+                    { WebResource.webResourceId }, { WebResourceArea.webResourceId },
+                    // and only keep when SPEED_URL = $speedUrl
+                    { WebResource.speedUrl.eq(speedUrl) }
+                )
+                .slice(WebResourceArea.informationalArea)
+                .selectAll()
+                .map { it[WebResourceArea.informationalArea] }
+                .toSet()
+        }
+        Log.info("Retrieved areas associated with '$speedUrl'")
+        Log.debug("Received ${areas.joinToString(prefix = "[", postfix = "]")}")
     }
 }
