@@ -1,45 +1,14 @@
-package args
-
 import com.xenomachina.argparser.ArgParser
 import com.xenomachina.argparser.InvalidArgumentException
 import com.xenomachina.argparser.default
-
-enum class Action {
-    LIST, // List all permissions for the user
-    ADD, // Add a permission/set of permissions for the user
-    COPY, // Copy permissions from a given person
-    REMOVE, // Add a permission/set of permissions for the user
-    VERSION; // Get version information
-
-    override fun toString(): String {
-        return when (this) {
-            LIST -> "list"
-            ADD -> "add"
-            COPY -> "copy"
-            REMOVE -> "remove"
-            VERSION -> "version"
-        }
-    }
-
-    companion object {
-        fun fromString(value: String) = when (value) {
-            "list" -> LIST
-            "add" -> ADD
-            "copy" -> COPY
-            "remove" -> REMOVE
-            "version", "--version" -> VERSION // accept "--version" because that's how most CLIs do it
-            else -> throw InvalidArgumentException(
-                "args.Action must be one of 'list', 'add', 'copy', 'remove', or 'version'"
-            )
-        }
-    }
-}
+import model.Action
+import model.Identifier
 
 class ChrysalisArgs(parser: ArgParser) {
     val action by parser.positional(
         "ACTION",
         help = "action to perform (possible actions: 'list', 'add', 'copy', 'remove', 'version')",
-        transform = Action.Companion::fromString
+        transform = ::actionFromString
     )
 
     val areas by parser.positionalList(
@@ -54,17 +23,17 @@ class ChrysalisArgs(parser: ArgParser) {
     val personId by parser.storing(
         "-p", "--personId",
         help = "perform the action for the person with the given Person ID"
-    ) { PersonId(this) }.default<PersonId?>(null)
+    ) { Identifier.PersonId(this) }.default(null)
 
     val byuId by parser.storing(
         "-b", "--byuId",
         help = "perform the action for the person with the given BYU ID"
-    ) { ByuId(this) }.default<ByuId?>(null)
+    ) { Identifier.ByuId(this) }.default(null)
 
     val netId by parser.storing(
         "-n", "--netId",
         help = "perform the action for the person with the given NetID"
-    ) { NetId(this) }.default<NetId?>(null)
+    ) { Identifier.NetId(this) }.default(null)
 
     val verbose by parser.counting(
         "-v", "--verbose",
@@ -75,4 +44,15 @@ class ChrysalisArgs(parser: ArgParser) {
         "--debug",
         help = "enable debug logging (overrides '--verbose' option)"
     )
+
+    private fun actionFromString(value: String) = when (value) {
+        "list" -> Action.LIST
+        "add" -> Action.ADD
+        "copy" -> Action.COPY
+        "remove" -> Action.REMOVE
+        "version", "--version" -> Action.VERSION // accept "--version" because that's how most CLIs do it
+        else -> throw InvalidArgumentException(
+            "args.Action must be one of 'list', 'add', 'copy', 'remove', or 'version'"
+        )
+    }
 }
